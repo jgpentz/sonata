@@ -1,23 +1,21 @@
-import logo from './logo.svg';
 import './App.css';
+import background from 'images/w98_desktop_bg.jpg'
+import Window from './components/window.js'
+import Draggable from 'react-draggable';
+ 
+
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div style={{
+      backgroundImage: `url(${background})`, 
+      backgroundPosition: 'center',
+      backgroundSize: 'cover',
+      backgroundRepeat: 'no-repeat',
+      width: '100vw',
+      height: '100vh'}
+    }>
+      <Window/>
     </div>
   );
 }
