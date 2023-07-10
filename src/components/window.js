@@ -2,7 +2,6 @@ import cd_audio_icon from 'images/cd_audio_icon.png'
 import '98.css'
 import Draggable from 'react-draggable';
 
-
 function TitleBar() {
     return(
         <div className='title-bar'>

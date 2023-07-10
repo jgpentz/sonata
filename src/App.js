@@ -1,7 +1,6 @@
 import './App.css';
 import background from 'images/w98_desktop_bg.jpg'
 import Window from './components/window.js'
-import Draggable from 'react-draggable';
  
 
 
