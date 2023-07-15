@@ -14,7 +14,9 @@ function App() {
       width: '100vw',
       height: '100vh'}
     }>
-      <Window/>
+      <Window defaultPos={[0, 0]}/>
+      <Window defaultPos={[500, 600]}/>
+      <Window defaultPos={[200, 300]}/>
     </div>
   );
 }
