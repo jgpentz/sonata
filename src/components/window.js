@@ -1,25 +1,56 @@
 import '98.css'
 import Draggable from 'react-draggable';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import TitleBar from './titlebar.js';
 
-export default function Window({defaultPos}) {
+/**
+ * Hook that alerts clicks outside of the passed ref
+ */
+function useOutsideAlerter(ref, setActiveWindow) {
+    useEffect(() => {
+      /**
+       * Alert if clicked on outside of element
+       */
+      function handleClickOutside(event) {
+        if (ref.current && !ref.current.contains(event.target)) {
+          setActiveWindow(false);
+        }
+      }
+      // Bind the event listener
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        // Unbind the event listener on clean up
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }, [ref, setActiveWindow]);
+  }
+  
+
+export default function Window({title, defaultPos}) {
     // Create a state variable for closing the window
     const [showWindow, setShowWindow] = useState(true);
-    // const [showWindow, setShowWindow] = useState(true);
+    const [minimizeWindow, setMinimizeWindow] = useState(false);
+    const [activeWindow, setActiveWindow] = useState(false)
+    
+    const wrapperRef = useRef(null);
+    useOutsideAlerter(wrapperRef, setActiveWindow);
 
-    // const a = 
-    // const closeWindow = useCallback(() => setShowWindow(false), [showWindow])
+    // Bring this window to the front of the screen and updates
+    // the titlebar to show that this window is active
+    const makeActiveWindow = (e) => {
+        // Set window as selected window
+        setActiveWindow(true)
 
-    const bringToFront = (e) => {
+        // Raises the z index of the window being dragged, bringing it to the
+        // front of the screen.    
         let elems = document.getElementsByClassName('react-draggable-dragged');
-        console.log(elems)
         for(let i = 0; i < elems.length; i++) {
             elems[i].style.zIndex = 1;
             e.currentTarget.style.zIndex = 2;
         }
     }
 
+    // Don't need to return a component if they closed the window
     if (!showWindow) {
         return null;
     }
@@ -29,13 +60,37 @@ export default function Window({defaultPos}) {
             handle=".title-bar" 
             defaultPosition={{x: defaultPos[0], y: defaultPos[1]}} 
             bounds="parent"
-            onStart={bringToFront}
+            onMouseDown={makeActiveWindow}
         >
-            <div class="window" style={{position: 'absolute', visibility: !showWindow? 'none' : '', width: '600px', height: '400px'}}>
-                <TitleBar closeWindow={() => setShowWindow(false)} />
-                <div class='window-body'>
-                    <p style={{fontSize: 12}}>Room for activites</p>
-                </div>
+            <div 
+                class="window" 
+                style={{
+                    position: 'absolute', 
+                    visibility: !showWindow? 'none' : '', 
+                    width: minimizeWindow ? '200px' : '600px',
+                }}
+                ref={wrapperRef}
+            >
+                {minimizeWindow ? (
+                    <TitleBar 
+                        title={title} 
+                        closeWindow={() => setShowWindow(false)} 
+                        minimizeWindow={() => setMinimizeWindow(true)}
+                        activeWindow={activeWindow}
+                    />
+                ) : (
+                    <div>
+                        <TitleBar 
+                            title={title} 
+                            closeWindow={() => setShowWindow(false)} 
+                            minimizeWindow={() => setMinimizeWindow(true)} 
+                            activeWindow={activeWindow}
+                        />
+                        <div class='window-body'>
+                            <p style={{fontSize: 12}}>Room for activites</p>
+                        </div>
+                    </div>
+                )}
             </div>
         </Draggable>
     );
