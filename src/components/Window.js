@@ -1,6 +1,6 @@
 import '98.css'
 import Draggable from 'react-draggable';
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useSyncExternalStore } from 'react';
 import TitleBar from './Titlebar.js';
 import MinimizedWindow from './MinimizedWindow.js';
 
@@ -27,13 +27,20 @@ function useOutsideAlerter(ref, setAlert) {
   }
   
 
-export default function Window({title, defaultPos}) {
+export default function Window({
+    title, 
+    defaultPos,
+    minimizeSlots,
+    setMinimizeSlots}) {
     // Create a state variable for closing the window
     const [closeWindow, setCloseWindow] = useState(false);
     const [minimizedWindow, setMinimizedWindow] = useState(false);
     const [activeWindow, setActiveWindow] = useState(false)
     const [position, setPosition] = useState(null)
     const [newPos, setNewPos] = useState(null)
+    const [minimizeSlotIdx, setMinimizeSlotIdx] = useState(null)
+
+    let minimizedWindowWidth = 200
   
     // set the window as inactive when clicked outside
     const wrapperRef = useRef(null);
@@ -67,12 +74,31 @@ export default function Window({title, defaultPos}) {
     const restoreWindow = () => {
         setMinimizedWindow(false)
         setNewPos({x: position['x'], y: position['y']})
+
+        // Free the slot in the minimized slots array
+        const newMinimizeSlots = minimizeSlots.slice()
+        newMinimizeSlots[minimizeSlotIdx] = false
+        setMinimizeSlots(newMinimizeSlots)
     }
 
     // Minimize the window to the bottom of the screen
     const minimizeWindow = () => {
         setMinimizedWindow(true)
-        setNewPos({x: 100, y: 200})
+
+        // Find a free minimize slot
+        let slotIdx = 0;
+        while(minimizeSlots[slotIdx]) {
+            slotIdx++;
+        }
+
+        // Save the slot index, set the position, and occupy the slot in the
+        // minimized slots array. Add 5 to new pos for margin, subtract 37
+        // from height because that's the minimizedwindow component height
+        setMinimizeSlotIdx(slotIdx)
+        setNewPos({x: (slotIdx * (minimizedWindowWidth + 5)), y: (window.innerHeight - 37)})
+        const newMinimizeSlots = minimizeSlots.slice()
+        newMinimizeSlots[slotIdx] = true
+        setMinimizeSlots(newMinimizeSlots)
     }
 
     // Store the position for use when restoring the window
@@ -100,7 +126,7 @@ export default function Window({title, defaultPos}) {
                 class="window" 
                 style={{
                     position: 'absolute', 
-                    width: minimizedWindow ? '200px' : '600px',
+                    width: minimizedWindow ? `${minimizedWindowWidth}px` : '600px',
                 }}
                 ref={wrapperRef}
             >

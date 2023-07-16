@@ -7,10 +7,21 @@ export default function MinimizedWindow({
     restoreWindow, 
     maximizeWindow,
     activeWindow}) {
+    
+    console.log(title.length)
 
     return(
-        <div className={`title-bar ${(activeWindow ? '' : 'inactive')}`}>
-            <div class='title-bar-text' style={{fontSize: 14}}>
+        <div className={`title-bar ${(activeWindow ? '' : 'inactive')}`} style={{height: '25px'}}>
+            <div 
+                class='title-bar-text' 
+                style={{
+                    fontSize: 14,
+                    marginRight: '5px',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                }}
+            >
                 <img alt="audio_icon" src={cd_audio_icon} style={{paddingRight: '5px'}}/>
                 {title}
             </div>
