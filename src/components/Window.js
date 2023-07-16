@@ -29,14 +29,12 @@ function useOutsideAlerter(ref, setAlert) {
 
 export default function Window({title, defaultPos}) {
     // Create a state variable for closing the window
-    const [showWindow, setShowWindow] = useState(true);
-    const [minimizeWindow, setMinimizeWindow] = useState(false);
+    const [closeWindow, setCloseWindow] = useState(false);
+    const [minimizedWindow, setMinimizedWindow] = useState(false);
     const [activeWindow, setActiveWindow] = useState(false)
-    const [position, setPosition] = useState({x: defaultPos[0], y: defaultPos[1]})
-
-    let currentPos = defaultPos
-    console.log(currentPos)
-    
+    const [position, setPosition] = useState(null)
+    const [newPos, setNewPos] = useState(null)
+  
     // set the window as inactive when clicked outside
     const wrapperRef = useRef(null);
     const setAlert = useCallback((state) => {
@@ -59,12 +57,33 @@ export default function Window({title, defaultPos}) {
         }
     }
 
-    const handleStop = (e, ele) => {
-        setPosition({x: ele.x, y: ele.y})
+    // After minimizing or restoring the window, have to set the
+    // position to null again so that it can be dragged
+    useEffect(() => {
+        setNewPos(null)
+    }, [minimizedWindow])
+
+    // Restore the window back to it's old position 
+    const restoreWindow = () => {
+        setMinimizedWindow(false)
+        setNewPos({x: position['x'], y: position['y']})
     }
 
+    // Minimize the window to the bottom of the screen
+    const minimizeWindow = () => {
+        setMinimizedWindow(true)
+        setNewPos({x: 100, y: 200})
+    }
+
+    // Store the position for use when restoring the window
+    const handleStop = (e, dragElement) => {
+        if (!minimizedWindow) {
+            setPosition({x: dragElement.x, y: dragElement.y})
+        }
+    }
+    
     // Don't need to return a component if they closed the window
-    if (!showWindow) {
+    if (closeWindow) {
         return null;
     }
     return(
@@ -75,30 +94,29 @@ export default function Window({title, defaultPos}) {
             bounds="parent"
             onMouseDown={makeActiveWindow}
             onStop={handleStop}
-            position={minimizeWindow ? {x: 100, y: 200} : null}
+            position={newPos}
         >
-            <div 
+            <div
                 class="window" 
                 style={{
                     position: 'absolute', 
-                    visibility: !showWindow? 'none' : '', 
-                    width: minimizeWindow ? '200px' : '600px',
+                    width: minimizedWindow ? '200px' : '600px',
                 }}
                 ref={wrapperRef}
             >
-                {minimizeWindow ? (
+                {minimizedWindow ? (
                     <MinimizedWindow 
                         title={title} 
-                        closeWindow={() => setShowWindow(false)} 
-                        restoreWindow={() => setMinimizeWindow(false)}
+                        closeWindow={() => setCloseWindow(true)} 
+                        restoreWindow={restoreWindow}
                         activeWindow={activeWindow}
                     />
                 ) : (
                     <div>
                         <TitleBar 
                             title={title} 
-                            closeWindow={() => setShowWindow(false)} 
-                            minimizeWindow={() => setMinimizeWindow(true)} 
+                            closeWindow={() => setCloseWindow(true)} 
+                            minimizeWindow={minimizeWindow} 
                             activeWindow={activeWindow}
                         />
                         <div class='window-body'>
