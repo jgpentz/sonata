@@ -1,7 +1,8 @@
 import '98.css'
 import Draggable from 'react-draggable';
 import { useState, useRef, useEffect, useCallback } from 'react';
-import TitleBar from './titlebar.js';
+import TitleBar from './Titlebar.js';
+import MinimizedWindow from './MinimizedWindow.js';
 
 /**
  * Hook that alerts clicks outside of the passed ref
@@ -31,6 +32,10 @@ export default function Window({title, defaultPos}) {
     const [showWindow, setShowWindow] = useState(true);
     const [minimizeWindow, setMinimizeWindow] = useState(false);
     const [activeWindow, setActiveWindow] = useState(false)
+    const [position, setPosition] = useState({x: defaultPos[0], y: defaultPos[1]})
+
+    let currentPos = defaultPos
+    console.log(currentPos)
     
     // set the window as inactive when clicked outside
     const wrapperRef = useRef(null);
@@ -54,6 +59,10 @@ export default function Window({title, defaultPos}) {
         }
     }
 
+    const handleStop = (e, ele) => {
+        setPosition({x: ele.x, y: ele.y})
+    }
+
     // Don't need to return a component if they closed the window
     if (!showWindow) {
         return null;
@@ -65,6 +74,8 @@ export default function Window({title, defaultPos}) {
             defaultPosition={{x: defaultPos[0], y: defaultPos[1]}} 
             bounds="parent"
             onMouseDown={makeActiveWindow}
+            onStop={handleStop}
+            position={minimizeWindow ? {x: 100, y: 200} : null}
         >
             <div 
                 class="window" 
@@ -76,10 +87,10 @@ export default function Window({title, defaultPos}) {
                 ref={wrapperRef}
             >
                 {minimizeWindow ? (
-                    <TitleBar 
+                    <MinimizedWindow 
                         title={title} 
                         closeWindow={() => setShowWindow(false)} 
-                        minimizeWindow={() => setMinimizeWindow(true)}
+                        restoreWindow={() => setMinimizeWindow(false)}
                         activeWindow={activeWindow}
                     />
                 ) : (
