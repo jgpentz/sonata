@@ -1,4 +1,4 @@
-import cd_audio_icon from 'images/cd_audio_icon.png'
+import cd_audio_icon_small from 'images/cd_audio_icon_small.png'
 import '98.css'
 
 export default function TitleBar({
@@ -11,7 +11,7 @@ export default function TitleBar({
     return(
         <div className={`title-bar ${(activeWindow ? '' : 'inactive')}`}>
             <div class='title-bar-text' style={{fontSize: 14}}>
-                <img alt="audio_icon" src={cd_audio_icon} style={{paddingRight: '5px'}}/>
+                <img alt="audio_icon" src={cd_audio_icon_small} style={{paddingRight: '5px'}}/>
                 {title}
             </div>
             <div className="title-bar-controls">
