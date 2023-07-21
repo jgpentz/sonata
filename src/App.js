@@ -1,6 +1,7 @@
 import './App.css';
 import background from 'images/w98_desktop_bg.jpg'
 import Window from './components/Window.js'
+import DesktopIcon from './components/DesktopIcon.js'
 import {useState} from 'react';
  
 
@@ -17,9 +18,10 @@ function App() {
 			width: '100vw',
 			height: '100vh'}
 		}>
+			<DesktopIcon/>
 			<Window 
 				title="Some Window A"
-				defaultPos={[0, 0]}
+				defaultPos={[100, 200]}
 				minimizeSlots={minimizeSlots}
 				setMinimizeSlots={setMinimizeSlots}
 			/>

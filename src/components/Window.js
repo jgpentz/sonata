@@ -96,6 +96,7 @@ export default function Window({
         // from height because that's the minimizedwindow component height
         setMinimizeSlotIdx(slotIdx)
         setNewPos({x: (slotIdx * (minimizedWindowWidth + 5)), y: (window.innerHeight - 37)})
+        console.log(window.innerHeight)
         const newMinimizeSlots = minimizeSlots.slice()
         newMinimizeSlots[slotIdx] = true
         setMinimizeSlots(newMinimizeSlots)
